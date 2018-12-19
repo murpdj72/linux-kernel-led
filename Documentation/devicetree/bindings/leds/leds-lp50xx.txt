@@ -1,0 +1,131 @@
+* Texas Instruments - LP5018/24/30/36 RGB LED driver
+
+The LP50XX is multi-channel, I2C RGB LED Drivers that can group RGB LEDs into
+a LED group or control them individually.
+
+The difference in these RGB LED drivers is the number of supported RGB modules.
+
+Required properties:
+	- compatible:
+		"ti,lp5018"
+		"ti,lp5024"
+		"ti,lp5030"
+		"ti,lp5036"
+	- reg :  I2C slave address
+		lp5018/24 - 0x28
+		lp5030/36 - 0x30
+	- #address-cells : 1
+	- #size-cells : 0
+
+Optional properties:
+	- enable-gpios : gpio pin to enable/disable the device.
+	- vled-supply : LED supply
+
+Required child properties:
+	- reg : A single entry denoting the LED module that controls
+		the RGB cluster.
+
+Required Child properties only is LED modules will be banked:
+	- ti,led-bank : This property denotes the LED module numbers that will
+			be controlled as a single RGB cluster.  Each LED module
+			number will be controlled by a single LED class instance.
+			There can only be one instance of the ti,led-bank
+			property for each device node.
+
+The LED outpus associated with the LED modules are defined in Table 1 of the
+corresponding data sheets.
+
+LP5018 - 6 Total RGB cluster LED outputs 0-5
+LP5024 - 8 Total RGB cluster LED outputs 0-7
+LP5030 - 10 Total RGB cluster LED outputs 0-9
+LP5036 - 12 Total RGB cluster LED outputs 0-11
+
+Optional child properties:
+	- label : see Documentation/devicetree/bindings/leds/common.txt
+	- linux,default-trigger :
+	   see Documentation/devicetree/bindings/leds/common.txt
+
+Examples:
+LP5018 and LP5024 example:
+led-controller@29 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	compatible = "ti,lp5024";
+	reg = <0x29>;
+	enable-gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
+	vled-supply = <&vmmcsd_fixed>;
+
+	led@0 {
+	        reg = <0>;
+	        label = "banked_leds";
+		ti,led-bank = <0 2 5 3 >;
+	};
+
+	led@1 {
+	        reg = <1>;
+	        label = "led1_mod";
+	};
+
+	led@4 {
+	        reg = <4>;
+	        label = "led4_mod";
+	};
+
+	led@6 {
+	        reg = <6>;
+	        label = "led6_mod";
+	};
+
+	led@7 {
+	        reg = <7>;
+	        label = "led7_mod";
+	};
+
+};
+
+LP5030 and LP5036 example:
+led-controller@30 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	compatible = "ti,lp5036";
+	reg = <0x30>;
+	enable-gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
+	vled-supply = <&vmmcsd_fixed>;
+
+	led@0 {
+	        reg = <0>;
+	        label = "led_banked";
+		ti,led-bank = <0 2 5 3 9 10 >;
+	};
+
+	led@1 {
+	        reg = <1>;
+	        label = "led1_mod";
+	};
+
+	led@4 {
+	        reg = <4>;
+	        label = "led4_mod";
+	};
+
+	led@6 {
+	        reg = <6>;
+	        label = "led6_mod";
+	};
+
+	led@7 {
+	        reg = <7>;
+	        label = "led7_mod";
+	};
+
+
+	led@8 {
+	        reg = <8>;
+	        label = "led8_mod";
+	};
+};
+
+
+For more product information please see the link below:
+http://www.ti.com/lit/ds/symlink/lp5024.pdf
+http://www.ti.com/lit/ds/symlink/lp5036.pdf
