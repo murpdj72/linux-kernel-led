@@ -1,0 +1,36 @@
+LP5018/LP5024/LP5030/LP5036 Common Driver
+=================================================
+
+Authors: Dan Murphy <dmurphy@ti.com>
+
+Description
+-----------
+The LP50XX RGB LED drivers have the ability to group multiple RGB cluster
+LEDs into a single group for simultaneous control or expose single RGB cluster
+for control.  This device exposes different register interfaces to control
+the cluster brightness as well as the individual RGB LEDs color intensity.
+
+RGB Cluster Color Control
+-------------------------
+The LP50xx driver will expose a file called "color" for each LED class instance
+defined.  This file will accept a 24-bit RGB value in which the the color of the
+RGB LEDs will be set.
+
+The 24-bit RGB value passed in follows the pattern 0xXXRRGGBB
+XX - Do not care ignored by the driver
+RR - is the 8 bit Red LED value
+GG - is the 8 bit Green LED value
+BB - is the 8 bit Blue LED value
+
+Example:
+LED module output 4 of the LP5024 will be a yellow color:
+echo 0xe6de00 > /sys/class/leds/lp5024\:led4_mod/color
+
+LED module output 4 of the LP5024 will be dimmed 50%:
+echo 0x80 > /sys/class/leds/lp5024\:led4_mod/brightness
+
+LED banked RGBs of the LP5036 will be a white color:
+echo 0xffffff > /sys/class/leds/lp5036\:led_banked/color
+
+LED banked RGBs of the LP50364 will be dimmed 50%:
+echo 0x80 > /sys/class/leds/lp5036\:led_banked/brightness
