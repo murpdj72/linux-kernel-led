@@ -2,10 +2,11 @@
 
 #include "bcm2709.dtsi"
 #include "bcm283x-rpi-smsc9514.dtsi"
+#include <dt-bindings/leds/common.h>
 
 / {
 	compatible = "raspberrypi,2-model-b", "brcm,bcm2836";
-	model = "Raspberry Pi 2 Model B";
+	model = "Raspberry Pie 2 Model B";
 };
 
 &gpio {
@@ -76,6 +77,60 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c1_pins>;
 	clock-frequency = <100000>;
+	status = "okay";
+
+	led-controller@30 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "multicolor,framework_test";
+		reg = <0x30>;
+
+		led@0 {
+		        reg = <0>;
+		        label = "rgb_test1";
+			led-colors = <LED_COLOR_ID_AMBER LED_COLOR_ID_RED>;
+		};
+	};
+
+	led-controller@29 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "ti,lp5024";
+		reg = <0x29>;
+		/*enable-gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;*/
+		/* vled-supply = <&vmmcsd_fixed>; */
+
+		led@0 {
+			reg = <0>;
+			label = "banked_leds";
+			ti,led-bank = <0 2 5 3 >;
+			led-colors = <LED_COLOR_ID_RED LED_COLOR_ID_GREEN LED_COLOR_ID_BLUE>;
+		};
+
+		led@1 {
+			reg = <1>;
+			label = "led1_mod";
+			led-colors = <LED_COLOR_ID_RED LED_COLOR_ID_GREEN LED_COLOR_ID_BLUE>;
+		};
+
+		led@4 {
+			reg = <4>;
+			label = "led4_mod";
+			led-colors = <LED_COLOR_ID_RED>;
+		};
+
+		led@6 {
+			reg = <6>;
+			label = "led6_mod";
+			led-colors = <LED_COLOR_ID_RED>;
+		};
+
+		led@7 {
+			reg = <7>;
+			label = "led7_mod";
+			led-colors = <LED_COLOR_ID_RED>;
+		};
+	};
 };
 
 &i2c2 {
