@@ -39,6 +39,10 @@ config LEDS_CLASS_MULTI_COLOR
 	  for the flash related features of a LED device. It can be built
 	  as a module.
 
+config LEDS_MULTI_COLOR_TEST
+	tristate "LED Mulit Color LED Class Test File"
+	depends on LEDS_CLASS_MULTI_COLOR
+
 config LEDS_BRIGHTNESS_HW_CHANGED
 	bool "LED Class brightness_hw_changed attribute support"
 	depends on LEDS_CLASS
