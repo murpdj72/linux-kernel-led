@@ -1,18 +1,99 @@
-Linux kernel
-============
 
-There are several guides for kernel developers and users. These guides can
-be rendered in a number of formats, like HTML and PDF. Please read
-Documentation/admin-guide/README.rst first.
+Multi Color LED handling under Linux
+=================================================
 
-In order to build the documentation, use ``make htmldocs`` or
-``make pdfdocs``.  The formatted documentation can also be read online at:
+Authors: Dan Murphy <dmurphy@ti.com>
 
-    https://www.kernel.org/doc/html/latest/
+Description
+-----------
+There are varying monochrome LED colors available for application.  These
+LEDs can be used as a single use case LED or can be mixed with other color
+LEDs to produce the full spectrum of color.  Color LEDs that are grouped
+can be grouped and presented under a LED node.  The multicolor class groups
+these LEDs and allows dynamically setting the value of a single LED or
+setting the brightness values of the LEDs in the group and updating the LEDs
+virtually simultaneously.
 
-There are various text files in the Documentation/ subdirectory,
-several of them using the Restructured Text markup notation.
+Multicolor Class Control
+-------------------------
+The multicolor class presents the LED groups under a directory called "colors".
+This directory is a child under the LED parent node created but the led_class
+framework.  The led_class framework is documented in led-class.txt within this
+documentation directory. 
 
-Please read the Documentation/process/changes.rst file, as it contains the
-requirements for building and running the kernel, and information about
-the problems which may result by upgrading your kernel.
+Each colored LED is given it's own directory.  These directories can be but not
+limited to red, green, blue, white, amber, yellow and violet.  Under these
+directories the brightness and max_brightness files are presented for each LED.
+
+Under the "colors" directory there are two files created "sync" and
+"sync_enable". The sync_enable file controls whether the LED brightness
+value is set real time or if the LED brightness value setting is deferred until
+the "sync" file is written.  If sync_enable is set then writing to each LED
+"brightness" file will store the brightness value.  Once the "sync" file is
+written then each LED color defined in the node will write the brightness of
+the LED in the device driver.
+
+If "sync_enable" is not set then writing the brightness value of the LED to the
+device driver is done immediately.  Writing the "sync" file has no affect.
+
+Directory Layout Example
+------------------------
+root:/sys/class/leds/rgb:grouped_leds# ls -lR colors/
+colors/:
+drwxr-xr-x    2 root     root             0 Jun 28 20:21 blue
+drwxr-xr-x    2 root     root             0 Jun 28 20:21 green
+drwxr-xr-x    2 root     root             0 Jun 28 20:21 red
+--w-------    1 root     root          4096 Jun 28 20:21 sync
+-rw-------    1 root     root          4096 Jun 28 20:22 sync_enable
+
+colors/blue:
+-rw-------    1 root     root          4096 Jun 28 20:21 brightness
+-r--------    1 root     root          4096 Jun 28 20:27 max_brightness
+
+colors/green:
+-rw-------    1 root     root          4096 Jun 28 20:22 brightness
+-r--------    1 root     root          4096 Jun 28 20:27 max_brightness
+
+colors/red:
+-rw-------    1 root     root          4096 Jun 28 20:21 brightness
+-r--------    1 root     root          4096 Jun 28 20:27 max_brightness
+
+Example of Writing LEDs with Sync Enabled
+-----------------------------------------
+Below the red, green and blue LEDs are set to corresponding values.  These
+values are stored and not written until the sync file is written.
+
+cd /sys/class/leds/rgb:grouped_leds/colors
+
+echo 1 > sync_enable
+
+echo 100 > red/brightness
+echo 80 > green/brightness
+echo 180 > blue/brightness
+
+* LED device driver has not been updated the LED states have not changed.
+* Writing the LED brightness files again will only change the stored value and
+* not the device driver value.
+
+echo 1 > sync
+
+* LED device driver has been updated the LEDs should present the color that
+* was set.  Since sync_enable is still enabled writing to the LED brightness
+* files will not change the current color.
+
+Example of Writing LEDs with Sync Disabled
+------------------------------------------
+Below the values of each LED are written to the device driver immediately upon
+request.
+
+cd /sys/class/leds/rgb:grouped_leds/colors
+
+echo 0 > sync_enable
+
+echo 100 > red/brightness // Red LED should be on with the current brightness
+echo 80 > green/brightness // Green LED should be on with the current brightness
+echo 180 > blue/brightness // Blue LED should be on with the current brightness
+.
+.
+.
+echo 0 > green/brightness // Green LED should be off
