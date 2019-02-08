@@ -12,6 +12,7 @@
  */
 
 #include <linux/leds.h>
+#include <linux/led-class-multicolor.h>
 #include <linux/mfd/motorola-cpcap.h>
 #include <linux/module.h>
 #include <linux/mutex.h>
@@ -28,6 +29,10 @@ struct cpcap_led_info {
 	u16 limit;
 	u16 init_mask;
 	u16 init_val;
+	u16 rgb_combo;
+	u16 red_reg;
+	u16 green_reg;
+	u16 blue_reg;
 };
 
 static const struct cpcap_led_info cpcap_led_red = {
@@ -44,6 +49,15 @@ static const struct cpcap_led_info cpcap_led_green = {
 
 static const struct cpcap_led_info cpcap_led_blue = {
 	.reg	= CPCAP_REG_BLUEC,
+	.mask	= 0x03FF,
+	.limit	= 31,
+};
+
+static const struct cpcap_led_info cpcap_led_rgb = {
+	.red_reg = CPCAP_REG_REDC,
+	.green_reg = CPCAP_REG_GREENC,
+	.blue_reg = CPCAP_REG_BLUEC,
+	.rgb_combo = 0x1,
 	.mask	= 0x03FF,
 	.limit	= 31,
 };
@@ -68,6 +82,7 @@ static const struct cpcap_led_info cpcap_led_cp = {
 
 struct cpcap_led {
 	struct led_classdev led;
+	struct led_classdev_mc mc_cdev;
 	const struct cpcap_led_info *info;
 	struct device *dev;
 	struct regmap *regmap;
@@ -116,6 +131,11 @@ static int cpcap_led_set(struct led_classdev *ledc, enum led_brightness value)
 
 	mutex_lock(&led->update_lock);
 
+	if (led->info->rgb_combo) {
+		err = 0;
+		goto exit;
+	}
+
 	if (value > LED_OFF) {
 		err = cpcap_led_set_power(led, true);
 		if (err)
@@ -154,10 +174,74 @@ exit:
 	return err;
 }
 
+static struct cpcap_led *mc_led_cdev_to_led(struct led_classdev_mc *mc_cdev)
+{
+	return container_of(mc_cdev, struct cpcap_led, mc_cdev);
+}
+
+static int cpcap_set_color(struct led_classdev_mc *mcled_cdev,
+			    int color, int value)
+{
+	struct cpcap_led *led = mc_led_cdev_to_led(mcled_cdev);
+	int brightness;
+	int color_reg;
+	int err;
+
+	mutex_lock(&led->update_lock);
+
+	if (value > LED_OFF) {
+		err = cpcap_led_set_power(led, true);
+		if (err)
+			goto exit;
+	}
+
+	if (LED_COLOR_ID_RED == color)
+		color_reg = led->info->red_reg;
+	else if (LED_COLOR_ID_GREEN == color)
+		color_reg = led->info->green_reg;
+	else if (LED_COLOR_ID_BLUE == color)
+		color_reg = led->info->blue_reg;
+	else
+		goto exit;
+
+	if (value == LED_OFF) {
+		/* Avoid HW issue by turning off current before duty cycle */
+		err = regmap_update_bits(led->regmap,
+			color_reg, led->info->mask, CPCAP_LED_NO_CURRENT);
+		if (err) {
+			dev_err(led->dev, "regmap failed: %d", err);
+			goto exit;
+		}
+
+		brightness = cpcap_led_val(value, LED_OFF);
+	} else {
+		brightness = cpcap_led_val(value, LED_ON);
+	}
+
+	err = regmap_update_bits(led->regmap, color_reg, led->info->mask,
+		brightness);
+	if (err) {
+		dev_err(led->dev, "regmap failed: %d", err);
+		goto exit;
+	}
+
+	if (value == LED_OFF)
+		err = cpcap_led_set_power(led, false);
+
+exit:
+	mutex_unlock(&led->update_lock);
+	return err;
+}
+
+static struct led_multicolor_ops cpcap_led_rgb_ops = {
+	.set_color_brightness = cpcap_set_color,
+};
+
 static const struct of_device_id cpcap_led_of_match[] = {
 	{ .compatible = "motorola,cpcap-led-red", .data = &cpcap_led_red },
 	{ .compatible = "motorola,cpcap-led-green", .data = &cpcap_led_green },
 	{ .compatible = "motorola,cpcap-led-blue",  .data = &cpcap_led_blue },
+	{ .compatible = "motorola,cpcap-led-rgb",  .data = &cpcap_led_rgb },
 	{ .compatible = "motorola,cpcap-led-adl", .data = &cpcap_led_adl },
 	{ .compatible = "motorola,cpcap-led-cp", .data = &cpcap_led_cp },
 	{},
@@ -167,6 +251,7 @@ MODULE_DEVICE_TABLE(of, cpcap_led_of_match);
 static int cpcap_led_probe(struct platform_device *pdev)
 {
 	const struct of_device_id *match;
+	struct led_classdev *led_cdev;
 	struct cpcap_led *led;
 	int err;
 
@@ -177,11 +262,12 @@ static int cpcap_led_probe(struct platform_device *pdev)
 	led = devm_kzalloc(&pdev->dev, sizeof(*led), GFP_KERNEL);
 	if (!led)
 		return -ENOMEM;
+
 	platform_set_drvdata(pdev, led);
 	led->info = match->data;
 	led->dev = &pdev->dev;
 
-	if (led->info->reg == 0x0000) {
+	if (!led->info->rgb_combo && led->info->reg == 0x0000) {
 		dev_err(led->dev, "Unsupported LED");
 		return -ENODEV;
 	}
@@ -202,21 +288,62 @@ static int cpcap_led_probe(struct platform_device *pdev)
 		dev_err(led->dev, "Couldn't read LED label: %d", err);
 		return err;
 	}
+	if (led->info->rgb_combo) {
+		led->mc_cdev.num_of_leds = device_property_read_u32_array(&pdev->dev,
+							       "led-colors",
+							        NULL, 0);
+
+		err = device_property_read_u32_array(&pdev->dev, "led-colors",
+						     led->mc_cdev.available_colors,
+						     led->mc_cdev.num_of_leds);
+	}
+
 
 	if (led->info->init_mask) {
-		err = regmap_update_bits(led->regmap, led->info->reg,
-			led->info->init_mask, led->info->init_val);
-		if (err) {
-			dev_err(led->dev, "regmap failed: %d", err);
-			return err;
+		if (led->info->rgb_combo) {
+			err = regmap_update_bits(led->regmap, led->info->red_reg,
+				led->info->init_mask, led->info->init_val);
+			if (err) {
+				dev_err(led->dev, "regmap failed: %d", err);
+				return err;
+			}
+			err = regmap_update_bits(led->regmap, led->info->green_reg,
+				led->info->init_mask, led->info->init_val);
+			if (err) {
+				dev_err(led->dev, "regmap failed: %d", err);
+				return err;
+			}
+			err = regmap_update_bits(led->regmap, led->info->blue_reg,
+				led->info->init_mask, led->info->init_val);
+			if (err) {
+				dev_err(led->dev, "regmap failed: %d", err);
+				return err;
+			}
+		} else {
+			err = regmap_update_bits(led->regmap, led->info->reg,
+				led->info->init_mask, led->info->init_val);
+			if (err) {
+				dev_err(led->dev, "regmap failed: %d", err);
+				return err;
+			}
 		}
 	}
 
 	mutex_init(&led->update_lock);
 
-	led->led.max_brightness = led->info->limit;
-	led->led.brightness_set_blocking = cpcap_led_set;
-	err = devm_led_classdev_register(&pdev->dev, &led->led);
+	if (!led->info->rgb_combo) {
+		led->led.max_brightness = led->info->limit;
+		led->led.brightness_set_blocking = cpcap_led_set;
+		err = devm_led_classdev_register(&pdev->dev, &led->led);
+	} else {
+		led->mc_cdev.ops = &cpcap_led_rgb_ops;
+		led_cdev = &led->mc_cdev.led_cdev;
+		led_cdev->name = led->led.name;
+		led_cdev->brightness_set_blocking = cpcap_led_set;
+		err = devm_led_classdev_multicolor_register(&pdev->dev,
+							    &led->mc_cdev);
+	}
+
 	if (err) {
 		dev_err(led->dev, "Couldn't register LED: %d", err);
 		return err;

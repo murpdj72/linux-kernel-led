@@ -253,11 +253,15 @@ static const struct mfd_cell cpcap_mfd_devices[] = {
 		.of_compatible = "motorola,cpcap-led-blue",
 	}, {
 		.name          = "cpcap-led",
-		.id            = 3,
+		.id            = 4,
+		.of_compatible = "motorola,cpcap-led-rgb",
+	}, {
+		.name          = "cpcap-led",
+		.id            = 5,
 		.of_compatible = "motorola,cpcap-led-adl",
 	}, {
 		.name          = "cpcap-led",
-		.id            = 4,
+		.id            = 6,
 		.of_compatible = "motorola,cpcap-led-cp",
 	}, {
 		.name          = "cpcap-codec",
