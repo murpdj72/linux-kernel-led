@@ -245,7 +245,7 @@
 		};
 	};
 };
-
+#include <dt-bindings/leds/common.h>
 &i2c2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c2_pins>;
@@ -253,45 +253,180 @@
 	status = "okay";
 	clock-frequency = <100000>;
 
-	cape_eeprom0: cape_eeprom0@54 {
-		compatible = "atmel,24c256";
-		reg = <0x54>;
+	lp5523: lp5523@32 {
 		#address-cells = <1>;
-		#size-cells = <1>;
-		cape0_data: cape_data@0 {
-			reg = <0 0x100>;
+		#size-cells = <0>;
+		compatible = "national,lp5523";
+		reg = <0x32>;
+		clock-mode = /bits/ 8 <0>; /* LP55XX_CLOCK_AUTO */
+		color = <LED_COLOR_ID_MULTI>;
+/*
+		chan0 {
+			color = <LED_COLOR_ID_GREEN>;
+			chan-name = "lp5523:channel0";
+			reg = <0x0>;
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+		};
+		chan7 {
+			color = <LED_COLOR_ID_RED>;
+			chan-name = "lp5523:channel6";
+			reg = <0x6>;
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+		};
+		chan2 {
+			color = <LED_COLOR_ID_BLUE>;
+			chan-name = "lp5523:channel2";
+			reg = <0x1>;
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+		};
+
+*/
+		multi-led@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+			color = <LED_COLOR_ID_MULTI>;
+			function = LED_FUNCTION_STANDBY;
+			linux,default-trigger = "heartbeat";
+
+			led@0 {
+				led-cur = /bits/ 8 <50>;
+				max-cur = /bits/ 8 <100>;
+				reg = <0x0>;
+				color = <LED_COLOR_ID_GREEN>;
+			};
+
+			led@1 {
+				led-cur = /bits/ 8 <50>;
+				max-cur = /bits/ 8 <100>;
+				reg = <0x1>;
+				color = <LED_COLOR_ID_BLUE>;
+			};
+
+			led@6 {
+				led-cur = /bits/ 8 <50>;
+				max-cur = /bits/ 8 <100>;
+				reg = <0x6>;
+				color = <LED_COLOR_ID_RED>;
+			};
+		};
+
+		chan5 {
+			color = <LED_COLOR_ID_WHITE>;
+			chan-name = "lp5523:channel5";
+			reg = <0x5>;
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
 		};
 	};
 
-	cape_eeprom1: cape_eeprom1@55 {
-		compatible = "atmel,24c256";
-		reg = <0x55>;
+	led-controller@14 {
 		#address-cells = <1>;
-		#size-cells = <1>;
-		cape1_data: cape_data@0 {
-			reg = <0 0x100>;
+		#size-cells = <0>;
+		compatible = "ti,lp5036";
+		reg = <0x14>;
+		/*enable-gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;*/
+		/* vled-supply = <&vmmcsd_fixed>; */
+		multi-led@0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+			color = <LED_COLOR_ID_MULTI>;
+			function = LED_FUNCTION_ACTIVITY;
+			
+			led@0 {
+				reg = <0>;
+				color = <LED_COLOR_ID_RED>;
+			};
+
+			led@1 {
+				reg = <1>;
+				color = <LED_COLOR_ID_GREEN>;
+			};
+
+			led@2 {
+				reg = <2>;
+				color = <LED_COLOR_ID_BLUE>;
+			};
+		};
+
+		multi-led@2 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <2>;
+			color = <LED_COLOR_ID_MULTI>;
+			function = LED_FUNCTION_STANDBY;
+			ti,led-bank = <2 3 >;
+
+			led@6 {
+				reg = <0x6>;
+				color = <LED_COLOR_ID_RED>;
+				led-sources = <6 9 15>;
+			};
+
+			led@7 {
+				reg = <0x7>;
+				color = <LED_COLOR_ID_GREEN>;
+				led-sources = <7 10 16>;
+			};
+
+			led@8 {
+				reg = <0x8>;
+				color = <LED_COLOR_ID_BLUE>;
+				led-sources = <8 11 17>;
+			};
+		};
+
+		multi-led@1 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <1>;
+			color = <LED_COLOR_ID_MULTI>;
+			function = LED_FUNCTION_STATUS;
+			
+			led@3 {
+				reg = <3>;
+				color = <LED_COLOR_ID_RED>;
+			};
+
+			led@4 {
+				reg = <4>;
+				color = <LED_COLOR_ID_GREEN>;
+			};
+
+			led@5 {
+				reg = <5>;
+				color = <LED_COLOR_ID_BLUE>;
+			};
+		};
+
+		multi-led@12 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <12>;
+			color = <LED_COLOR_ID_MULTI>;
+			function = "DUMMY";
+			
+			led@33 {
+				reg = <33>;
+				color = <LED_COLOR_ID_RED>;
+			};
+
+			led@34 {
+				reg = <34>;
+				color = <LED_COLOR_ID_GREEN>;
+			};
+
+			led@35 {
+				reg = <35>;
+				color = <LED_COLOR_ID_BLUE>;
+			};
 		};
 	};
 
-	cape_eeprom2: cape_eeprom2@56 {
-		compatible = "atmel,24c256";
-		reg = <0x56>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		cape2_data: cape_data@0 {
-			reg = <0 0x100>;
-		};
-	};
-
-	cape_eeprom3: cape_eeprom3@57 {
-		compatible = "atmel,24c256";
-		reg = <0x57>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		cape3_data: cape_data@0 {
-			reg = <0 0x100>;
-		};
-	};
 };
 
 
