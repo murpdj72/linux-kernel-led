@@ -1,0 +1,26 @@
+language: c
+os:
+  - linux
+before_install:
+  - sudo apt-get update -qq
+  #- wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2;name=gcc-arm-none
+#  - tar xf gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
+#  - export PATH=$PATH:$PWD/gcc-arm-none-eabi-7-2018-q2-update/bin/
+#  - arm-none-eabi-gcc --version
+  - wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
+  - tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
+  - export PATH=$PATH:$PWD/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/
+  - arm-linux-gnueabihf-gcc --version
+  - sudo apt-get install bc
+
+before_script:
+
+script:
+  # exporting the variable to be used by make utility  
+  - export ARCH=arm 
+  - export CROSS_COMPILE=arm-linux-gnueabihf-
+#  - export CROSS_COMPILE=arm-none-eabi-
+  - make -j32 mrproper
+#  - make -j32 multi_v7_defconfig 2>&1
+  - make -j32 omap2plus_defconfig 2>&1
+  - make -j32 2>&1
