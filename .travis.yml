@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: GPL-2.0+
+# Copyright (C) 2019 Texas Instruments Incorporated - http://www.ti.com/
+
+# build Linux Kernel on Travis CI - https://travis-ci.org/
+# Abstracted from uBoot travis.yml (Why reinvent the wheel?)
+
+language: c
+sudo: required
+os:
+  - linux
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-trusty-7
+    packages:
+    - bison
+    - flex
+    - cppcheck
+    - sloccount
+    - sparse
+    - bc
+    - build-essential
+    - libsdl1.2-dev
+    - python
+    - python-virtualenv
+    - swig
+    - libpython-dev
+    - iasl
+    - grub-efi-ia32-bin
+    - grub-efi-amd64-bin
+    - rpm2cpio
+    - wget
+    - device-tree-compiler
+    - lzop
+    - liblz4-tool
+    - lzma-alone
+    - libisl15
+    - clang-7
+    - srecord
+
+install:
+  - sudo apt-get update -qq
+  - git clone --depth=1 https://github.com/nmenon/kernel_patch_verify.git /tmp/kernel-test-hooks
+  - mkdir -p toolchain
+  - cd toolchain
+  - wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
+  - wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
+  - tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
+  - tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
+  - cd ..
+  - export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/
+  - arm-linux-gnueabihf-gcc --version
+  - aarch64-linux-gnu-gcc --version
+  #- sudo apt-get install bc
+
+env:
+
+before_script:
+
+script:
+  # exporting the variable to be used by make utility  
+  - export ARCH=arm
+  - export CROSS_COMPILE=arm-linux-gnueabihf-
+  - make -j32 mrproper
+  - make -j32 multi_v7_defconfig 2>&1
+  - make -j32 2>&1
+  - export ARCH=arm64
+  - export CROSS_COMPILE=aarch64-linux-gnu-
+  - make -j32 mrproper
+  - make -j32 defconfig 2>&1
+  - make -j32 2>&1
