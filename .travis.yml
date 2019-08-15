@@ -7,8 +7,6 @@
 language: c
 sudo: required
 dist: trusty
-#os:
-#  - linux
 
 addons:
   apt:
@@ -19,27 +17,14 @@ addons:
     - bison
     - flex
     - cppcheck
-    - sloccount
     - sparse
     - bc
-    - build-essential
-    - libsdl1.2-dev
-    - python
-    - python-virtualenv
     - swig
-    - libpython-dev
-    - iasl
-    - grub-efi-ia32-bin
-    - grub-efi-amd64-bin
-    - rpm2cpio
-    - wget
     - device-tree-compiler
     - lzop
     - liblz4-tool
     - lzma-alone
     - libisl15
-    - clang-7
-    - srecord
 
 install:
   - sudo apt-get update -qq
@@ -61,15 +46,16 @@ before_script:
 
 script:
   # exporting the variable to be used by make utility  
-  - export ARCH=arm
-  - export CROSS_COMPILE=arm-linux-gnueabihf-
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
   - echo $BUILD_THREADS
-  - make -j32 mrproper
-  - make -j32 multi_v7_defconfig 2>&1
-  - make -j32 2>&1
   - export ARCH=arm64
   - export CROSS_COMPILE=aarch64-linux-gnu-
   - make -j32 mrproper
   - make -j32 defconfig 2>&1
   - make -j32 2>&1
+  - export ARCH=arm
+  - export CROSS_COMPILE=arm-linux-gnueabihf-
+  - make -j32 mrproper
+  - make -j32 multi_v7_defconfig 2>&1
+  - make -j32 2>&1
+
