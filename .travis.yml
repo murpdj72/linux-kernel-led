@@ -64,11 +64,12 @@ script:
   - export ARCH=arm
   - export CROSS_COMPILE=arm-linux-gnueabihf-
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-  - make -j${BUILD_THREADS} mrproper
-  - make -j${BUILD_THREADS} multi_v7_defconfig 2>&1
-  - make -j${BUILD_THREADS} 2>&1
+  - echo $BUILD_THREADS
+  - make -j32 mrproper
+  - make -j32 multi_v7_defconfig 2>&1
+  - make -j32 2>&1
   - export ARCH=arm64
   - export CROSS_COMPILE=aarch64-linux-gnu-
-  - make -j${BUILD_THREADS} mrproper
-  - make -j${BUILD_THREADS} defconfig 2>&1
-  - make -j${BUILD_THREADS} 2>&1
+  - make -j32 mrproper
+  - make -j32 defconfig 2>&1
+  - make -j32 2>&1
