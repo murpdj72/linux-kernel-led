@@ -48,26 +48,21 @@ before_script:
 
 script:
   # exporting the variable to be used by make utility  
-  - pwd
+  # exporting the variable to be used by make utility  
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-  - if [[ "${BUILDMAN}" == arm64 ]]; then
-      export ARCH=arm64
-      export CROSS_COMPILE=aarch64-linux-gnu-
-      aarch64-linux-gnu-gcc --version
-      make -j4 defconfig 2>&1
-      make -j4 ${EXTRA_FLAGS} 2>&1;
-      #make -j4 ${EXTRA_FLAGS} drivers/gpu/drm/bridge/ 2>&1
-      #make -j4 ${EXTRA_FLAGS} drivers/phy/ti/ 2>&1
-      #make -j4 ${EXTRA_FLAGS} drivers/phy/cadence/ 2>&1
-      #make -j4 ${EXTRA_FLAGS} drivers/usb/ 2>&1;
-    fi
-  - if [[ "${BUILDMAN}" == arm ]]; then
-      export ARCH=arm
-      export CROSS_COMPILE=arm-linux-gnueabihf-
-      arm-linux-gnueabihf-gcc --version
-      make -j4 multi_v7_defconfig 2>&1
-      make -j4 ${EXTRA_FLAGS} 2>&1;
-    fi
+  - echo $BUILD_THREADS
+  - export ARCH=arm64
+  - export CROSS_COMPILE=aarch64-linux-gnu-
+  - make -j4 defconfig 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/gpu/drm/bridge/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/phy/ti/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/phy/cadence/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/usb/ 2>&1
+#  - make -j4 distclean
+#  - export ARCH=arm
+#  - export CROSS_COMPILE=arm-linux-gnueabihf-
+#  - make -j4 multi_v7_defconfig 2>&1
+#  - make -j4 ${EXTRA_FLAGS} 2>&1
 
 matrix:
   include:
