@@ -41,9 +41,9 @@ before_script:
      export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/;
    fi
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
-	wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
-	tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
-	export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/;
+      wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
+      tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
+      export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/;
     fi
 
 script:
