@@ -61,16 +61,4 @@ script:
 #  - make -j4 multi_v7_defconfig 2>&1
 #  - make -j4 ${EXTRA_FLAGS} 2>&1
 
-matrix:
-  include:
-  # we need to build by vendor due to 50min time limit for builds
-  # each env setting here is a dedicated build
-    - name: "buildman arm"
-      env:
-        - BUILDMAN="arm"
-          TOOLCHAIN="arm"
-    - name: "buildman arm64"
-      env:
-        - BUILDMAN="arm64"
-          TOOLCHAIN="arm64"
 
