@@ -25,6 +25,7 @@ addons:
     - liblz4-tool
     - lzma-alone
     - libisl15
+    - libelf-dev
 
 install:
   - sudo apt-get update -qq
