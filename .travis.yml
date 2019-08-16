@@ -45,6 +45,7 @@ before_script:
       tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
       export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/;
     fi
+  - cd ..
 
 script:
   # exporting the variable to be used by make utility  
@@ -62,6 +63,11 @@ script:
      export ARCH=arm &&
      export CROSS_COMPILE=arm-linux-gnueabihf- &&
      make -j4 multi_v7_defconfig 2>&1 &&
+     make -j4 ${EXTRA_FLAGS} 2>&1;
+    fi
+  - if [[ "${TOOLCHAIN}" == x86 ]]; then
+     export ARCH=arm64 &&
+     make -j4 defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
 
