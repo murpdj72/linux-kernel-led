@@ -53,15 +53,15 @@ script:
   - echo $BUILD_THREADS
   - pwd
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
-     export ARCH=arm64
-     export CROSS_COMPILE=aarch64-linux-gnu-
-     make -j4 defconfig 2>&1
+     export ARCH=arm64 &&
+     export CROSS_COMPILE=aarch64-linux-gnu- &&
+     make -j4 defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
   - if [[ "${TOOLCHAIN}" == arm ]]; then
-     export ARCH=arm
-     export CROSS_COMPILE=arm-linux-gnueabihf-
-     make -j4 multi_v7_defconfig 2>&1
+     export ARCH=arm &&
+     export CROSS_COMPILE=arm-linux-gnueabihf- &&
+     make -j4 multi_v7_defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
 
