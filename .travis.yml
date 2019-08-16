@@ -50,13 +50,12 @@ script:
   # exporting the variable to be used by make utility  
   - pwd
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-  - echo $BUILD_THREADS
   - if [[ "${BUILDMAN}" == arm64 ]]; then
       export ARCH=arm64
       export CROSS_COMPILE=aarch64-linux-gnu-
       aarch64-linux-gnu-gcc --version
       make -j4 defconfig 2>&1
-      make -j4 ${EXTRA_FLAGS} 2>&1
+      make -j4 ${EXTRA_FLAGS} 2>&1;
       #make -j4 ${EXTRA_FLAGS} drivers/gpu/drm/bridge/ 2>&1
       #make -j4 ${EXTRA_FLAGS} drivers/phy/ti/ 2>&1
       #make -j4 ${EXTRA_FLAGS} drivers/phy/cadence/ 2>&1
