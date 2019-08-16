@@ -51,6 +51,7 @@ script:
   # exporting the variable to be used by make utility  
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
   - echo $BUILD_THREADS
+  - pwd
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64
      export CROSS_COMPILE=aarch64-linux-gnu-
