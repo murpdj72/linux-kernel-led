@@ -35,14 +35,7 @@ env:
 before_script:
   - mkdir -p toolchain
   - cd toolchain
-  - if [[ "${TOOLCHAIN}" == "arm" ]]; then
-     wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
-     tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
-     export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/;
-   fi;
-  - if [[ "${TOOLCHAIN}" == "arm64" ]]; then
-	wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz && tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz && export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/;
-    fi;
+
 
 script:
   # exporting the variable to be used by make utility  
@@ -61,4 +54,16 @@ script:
 #  - make -j4 multi_v7_defconfig 2>&1
 #  - make -j4 ${EXTRA_FLAGS} 2>&1
 
+matrix:
+  include:
+  # we need to build by vendor due to 50min time limit for builds
+  # each env setting here is a dedicated build
+    - name: "buildman arm"
+      env:
+        - BUILDMAN="arm"
+          TOOLCHAIN="arm"
+    - name: "buildman arm64"
+      env:
+        - BUILDMAN="arm64"
+          TOOLCHAIN="arm64"
 
