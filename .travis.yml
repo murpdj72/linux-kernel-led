@@ -25,6 +25,7 @@ addons:
     - liblz4-tool
     - lzma-alone
     - libisl15
+    - spatch
 
 install:
   - sudo apt-get update -qq
@@ -42,7 +43,7 @@ install:
   - aarch64-linux-gnu-gcc --version
 
 env:
-  - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y CONFIG_DEBUG_SECTION_MISMATCH=y"
+  - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y CONFIG_DEBUG_SECTION_MISMATCH=y C=2 CHECK="scripts/coccicheck" MODE=report"
 
 before_script:
 
