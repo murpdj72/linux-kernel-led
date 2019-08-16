@@ -37,37 +37,32 @@ before_script:
   - cd toolchain
   - if [[ "${TOOLCHAIN}" == arm ]]; then
      wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz &&
-     tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz &&
-     export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/;
+     tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz;
    fi
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
       wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
-      tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
-      export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/;
+      tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz;
     fi
   - cd ..
 
 script:
   # exporting the variable to be used by make utility  
-  # exporting the variable to be used by make utility  
   - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-  - echo $BUILD_THREADS
   - pwd
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64 &&
-     export CROSS_COMPILE=aarch64-linux-gnu- &&
+     export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu- &&
      make -j4 defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
   - if [[ "${TOOLCHAIN}" == arm ]]; then
      export ARCH=arm &&
-     export CROSS_COMPILE=arm-linux-gnueabihf- &&
+     export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf- &&
      make -j4 multi_v7_defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
-  - if [[ "${TOOLCHAIN}" == x86 ]]; then
-     export ARCH=arm64 &&
-     make -j4 defconfig 2>&1 &&
+  - if [[ "${TOOLCHAIN}" == x86_64 ]]; then
+     make -j4 x86_64_defconfig 2>&1 &&
      make -j4 ${EXTRA_FLAGS} 2>&1;
     fi
 
@@ -83,4 +78,8 @@ matrix:
       env:
         - BUILDMAN="arm64"
           TOOLCHAIN="arm64"
+    - name: "buildman x86_64"
+      env:
+        - BUILDMAN="x86_64"
+          TOOLCHAIN="x86_64"
 
