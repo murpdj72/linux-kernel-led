@@ -50,12 +50,15 @@ script:
   - echo $BUILD_THREADS
   - export ARCH=arm64
   - export CROSS_COMPILE=aarch64-linux-gnu-
-  - make -j32 mrproper
-  - make -j32 defconfig 2>&1
-  - make -j32 2>&1
+  - make -j4 defconfig 2>&1
+  - make -j4 drivers/gpu/drm/bridge/ 2>&1
+  - make -j4 drivers/phy/ti/ 2>&1
+  - make -j4 drivers/phy/cadence/ 2>&1
+  - make -j4 drivers/usb/ 2>&1
+  - make -j4 distclean
   - export ARCH=arm
   - export CROSS_COMPILE=arm-linux-gnueabihf-
-  - make -j32 mrproper
-  - make -j32 multi_v7_defconfig 2>&1
-  - make -j32 2>&1
+  - make -j4 mrproper
+  - make -j4 multi_v7_defconfig 2>&1
+  - make -j4 2>&1
 
