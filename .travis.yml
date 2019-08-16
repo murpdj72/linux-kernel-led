@@ -58,11 +58,12 @@ script:
   - make -j4 ${EXTRA_FLAGS} drivers/phy/ti/ 2>&1
   - make -j4 ${EXTRA_FLAGS} drivers/phy/cadence/ 2>&1
   - make -j4 ${EXTRA_FLAGS} drivers/usb/ 2>&1
-#  - make -j4 distclean
-#  - export ARCH=arm
-#  - export CROSS_COMPILE=arm-linux-gnueabihf-
-#  - make -j4 multi_v7_defconfig 2>&1
-#  - make -j4 ${EXTRA_FLAGS} 2>&1
+  - if [[ "${TOOLCHAIN}" == arm ]]; then
+     export ARCH=arm
+     export CROSS_COMPILE=arm-linux-gnueabihf-
+     make -j4 multi_v7_defconfig 2>&1
+     make -j4 ${EXTRA_FLAGS} 2>&1;
+    fi
 
 matrix:
   include:
