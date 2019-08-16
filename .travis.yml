@@ -36,11 +36,13 @@ install:
   - tar xf gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz
   - tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
   - cd ..
-  - export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/
+  - export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/
+  - export PATH=$PATH:$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/
   - arm-linux-gnueabihf-gcc --version
   - aarch64-linux-gnu-gcc --version
 
 env:
+  - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y CONFIG_DEBUG_SECTION_MISMATCH=y"
 
 before_script:
 
@@ -51,14 +53,13 @@ script:
   - export ARCH=arm64
   - export CROSS_COMPILE=aarch64-linux-gnu-
   - make -j4 defconfig 2>&1
-  - make -j4 drivers/gpu/drm/bridge/ 2>&1
-  - make -j4 drivers/phy/ti/ 2>&1
-  - make -j4 drivers/phy/cadence/ 2>&1
-  - make -j4 drivers/usb/ 2>&1
-  - make -j4 distclean
-  - export ARCH=arm
-  - export CROSS_COMPILE=arm-linux-gnueabihf-
-  - make -j4 mrproper
-  - make -j4 multi_v7_defconfig 2>&1
-  - make -j4 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/gpu/drm/bridge/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/phy/ti/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/phy/cadence/ 2>&1
+  - make -j4 ${EXTRA_FLAGS} drivers/usb/ 2>&1
+#  - make -j4 distclean
+#  - export ARCH=arm
+#  - export CROSS_COMPILE=arm-linux-gnueabihf-
+#  - make -j4 multi_v7_defconfig 2>&1
+#  - make -j4 ${EXTRA_FLAGS} 2>&1
 
