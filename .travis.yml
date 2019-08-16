@@ -43,6 +43,10 @@ before_script:
       wget https://developer.arm.com/-/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz &&
       tar xf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz;
     fi
+  - if [[ "${TOOLCHAIN}" == x86_64 ]]; then
+      wget https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/8.1.0/x86_64-gcc-8.1.0-nolibc-x86_64-linux.tar.gz &&
+      tar xf x86_64-gcc-8.1.0-nolibc-x86_64-linux.tar.gz;
+    fi
   - cd ..
 
 script:
@@ -53,17 +57,18 @@ script:
      export ARCH=arm64 &&
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu- &&
      make -j4 defconfig 2>&1 &&
-     make -j4 ${EXTRA_FLAGS} 2>&1;
+     make -j8 ${EXTRA_FLAGS} 2>&1;
     fi
   - if [[ "${TOOLCHAIN}" == arm ]]; then
      export ARCH=arm &&
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf- &&
      make -j4 multi_v7_defconfig 2>&1 &&
-     make -j4 ${EXTRA_FLAGS} 2>&1;
+     make -j8 ${EXTRA_FLAGS} 2>&1;
     fi
   - if [[ "${TOOLCHAIN}" == x86_64 ]]; then
+     export CROSS_COMPILE=$PWD/toolchain/gcc-8.1.0-nolibc/x86_64-linux/bin/x86_64-linux- &&
      make -j4 x86_64_defconfig 2>&1 &&
-     make -j4 ${EXTRA_FLAGS} 2>&1;
+     make -j8 ${EXTRA_FLAGS} 2>&1;
     fi
 
 matrix:
