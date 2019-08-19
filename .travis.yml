@@ -92,21 +92,23 @@ matrix:
     - name: "drm bridge partial"
       env:
         - TOOLCHAIN="arm64"
-          TARGET_BRANCH="travis_work"
+          TARGET_BRANCH="travis_baseline"
           TARGET_MODULE="drivers/gpu/drm/bridge/"
     - name: "phy ti partial"
       env:
         - TOOLCHAIN="arm64"
-          TARGET_BRANCH="travis_work"
+          TARGET_BRANCH="travis_baseline"
           TARGET_MODULE="drivers/phy/ti/"
-          EXTRA_FLAGS="C=2 fake "${EXTRA_FLAGS}
+          EXTRA_FLAGS="C=2 "${EXTRA_FLAGS}
     - name: "Cadence partial"
       env:
         - TOOLCHAIN="arm64"
-          TARGET_BRANCH="travis_work"
+          TARGET_BRANCH="travis_baseline"
           TARGET_MODULE="drivers/phy/cadence/"
+          EXTRA_FLAGS="C=2 "${EXTRA_FLAGS}
     - name: "USB partial"
       env:
         - TOOLCHAIN="arm64"
-          TARGET_BRANCH="travis_work"
+          TARGET_BRANCH="travis_baseline"
           TARGET_MODULE="drivers/usb/"
+          EXTRA_FLAGS="C=2 "${EXTRA_FLAGS}
