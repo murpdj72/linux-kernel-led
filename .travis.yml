@@ -31,6 +31,10 @@ install:
   - sudo apt-get update -qq
 
 env:
+  global:
+    - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
+    - export EXTRA_FLAGS="C=2 fake CONFIG_COMPLIE_TEST=y"
+
 before_script:
   - mkdir -p toolchain
   - cd toolchain
@@ -51,24 +55,22 @@ before_script:
 
 script:
   # exporting the variable to be used by make utility  
-  - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-  - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y"
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-;
-     make -j4 defconfig 2>&1;
-     make -j16 ${EXTRA_FLAGS} 2>&1;
+     make -j4 defconfig;
+     make -j16 ${EXTRA_FLAGS};
     fi
   - if [[ "${TOOLCHAIN}" == arm ]]; then
      export ARCH=arm;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-;
-     make -j4 multi_v7_defconfig 2>&1;
-     make -j16 ${EXTRA_FLAGS} 2>&1;
+     make -j4 multi_v7_defconfig;
+     make -j16 ${EXTRA_FLAGS};
     fi
   - if [[ "${TOOLCHAIN}" == x86_64 ]]; then
      export CROSS_COMPILE=$PWD/toolchain/gcc-8.1.0-nolibc/x86_64-linux/bin/x86_64-linux-;
-     make -j4 x86_64_defconfig 2>&1;
-     make -j16 ${EXTRA_FLAGS} 2>&1;
+     make -j4 x86_64_defconfig;
+     make -j16 ${EXTRA_FLAGS};
     fi
 
 matrix:
