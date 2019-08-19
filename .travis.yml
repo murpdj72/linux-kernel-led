@@ -36,7 +36,6 @@ env:
     - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y"
 
 before_script:
-  - echo -e ${TRAVIS_BRANCH}
   - if [[ "${TRAVIS_BRANCH}" != ${TARGET_BRANCH} ]]; then exit 0 ; fi
   - mkdir -p toolchain
   - cd toolchain
@@ -95,3 +94,19 @@ matrix:
         - TOOLCHAIN="arm64"
           TARGET_BRANCH="travis_work"
           TARGET_MODULE="drivers/gpu/drm/bridge/"
+    - name: "phy ti partial"
+      env:
+        - TOOLCHAIN="arm64"
+          TARGET_BRANCH="travis_work"
+          TARGET_MODULE="drivers/phy/ti/"
+          EXTRA_FLAGS="C=2 fake "${EXTRA_FLAGS}
+    - name: "Cadence partial"
+      env:
+        - TOOLCHAIN="arm64"
+          TARGET_BRANCH="travis_work"
+          TARGET_MODULE="drivers/phy/cadence/"
+    - name: "USB partial"
+      env:
+        - TOOLCHAIN="arm64"
+          TARGET_BRANCH="travis_work"
+          TARGET_MODULE="drivers/usb/"
