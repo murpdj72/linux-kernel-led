@@ -36,6 +36,8 @@ env:
     - export EXTRA_FLAGS="CONFIG_COMPLIE_TEST=y"
 
 before_script:
+  - echo -e ${TRAVIS_BRANCH}
+  - if [[ "${TRAVIS_BRANCH}" != ${TARGET_BRANCH} ]]; then exit 0 ; fi
   - mkdir -p toolchain
   - cd toolchain
   - echo ${EXTRA_FLAGS}
@@ -54,9 +56,6 @@ before_script:
   - cd ..
 
 script:
-  - BRANCH_NAME=$(git branch | grep "*" |  awk '{print$2}')
-  - git branch
-  - if [[ "${BRANCH_NAME}" != ${TARGET_BRANCH} ]]; then exit 0 ; fi
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-;
@@ -87,7 +86,7 @@ matrix:
       env:
         - TOOLCHAIN="arm64"
           TARGET_BRANCH="master"
-    - name: "x86_64"
+    - name: "x86_64 full build"
       env:
         - TOOLCHAIN="x86_64"
           TARGET_BRANCH="master"
