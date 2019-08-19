@@ -33,7 +33,7 @@ install:
 env:
   global:
     - export BUILD_THREADS=$(grep "^processor" /proc/cpuinfo | wc -l)
-    - export EXTRA_FLAGS="C=2 fake CONFIG_COMPLIE_TEST=y"
+    - export EXTRA_FLAGS="C=2 CONFIG_COMPLIE_TEST=y"
 
 before_script:
   - mkdir -p toolchain
@@ -54,38 +54,37 @@ before_script:
   - cd ..
 
 script:
-  # exporting the variable to be used by make utility  
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-;
-     make -j4 defconfig;
-     make -j16 ${EXTRA_FLAGS};
+     make -j${BUILD_THREADS} defconfig;
+     make -j${BUILD_THREADS} ${EXTRA_FLAGS};
     fi
   - if [[ "${TOOLCHAIN}" == arm ]]; then
      export ARCH=arm;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/arm-linux-gnueabihf-;
-     make -j4 multi_v7_defconfig;
-     make -j16 ${EXTRA_FLAGS};
+     make -j${BUILD_THREADS} multi_v7_defconfig;
+     make -j${BUILD_THREADS} ${EXTRA_FLAGS};
     fi
   - if [[ "${TOOLCHAIN}" == x86_64 ]]; then
      export CROSS_COMPILE=$PWD/toolchain/gcc-8.1.0-nolibc/x86_64-linux/bin/x86_64-linux-;
-     make -j4 x86_64_defconfig;
-     make -j16 ${EXTRA_FLAGS};
+     make -j${BUILD_THREADS} x86_64_defconfig;
+     make -j${BUILD_THREADS} ${EXTRA_FLAGS};
     fi
 
 matrix:
   include:
   # we need to build by vendor due to 50min time limit for builds
   # each env setting here is a dedicated build
-    - name: "buildman arm"
+    - name: "arm"
       env:
         - BUILDMAN="arm"
           TOOLCHAIN="arm"
-    - name: "buildman arm64"
+    - name: "arm64"
       env:
         - BUILDMAN="arm64"
           TOOLCHAIN="arm64"
-    - name: "buildman x86_64"
+    - name: "x86_64"
       env:
         - BUILDMAN="x86_64"
           TOOLCHAIN="x86_64"
