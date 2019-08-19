@@ -55,7 +55,8 @@ before_script:
 
 script:
   - BRANCH_NAME=$(git branch | grep "*" |  awk '{print$2}')
-  - if [[ "${BRANCH_NAME}" != ${TARGET_BRANCH} ]]; then exit 0; fi
+  - git branch
+  - if [[ "${BRANCH_NAME}" != ${TARGET_BRANCH} ]]; then exit 0 ; fi
   - if [[ "${TOOLCHAIN}" == arm64 ]]; then
      export ARCH=arm64;
      export CROSS_COMPILE=$PWD/toolchain/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu-;
@@ -78,24 +79,20 @@ matrix:
   include:
   # we need to build by vendor due to 50min time limit for builds
   # each env setting here is a dedicated build
-    - name: "arm"
+    - name: "arm full build"
       env:
-        - BUILDMAN="arm"
-          TOOLCHAIN="arm"
+        - TOOLCHAIN="arm"
           TARGET_BRANCH="master"
-    - name: "arm64"
+    - name: "arm64 full build"
       env:
-        - BUILDMAN="arm64"
-          TOOLCHAIN="arm64"
+        - TOOLCHAIN="arm64"
           TARGET_BRANCH="master"
     - name: "x86_64"
       env:
-        - BUILDMAN="x86_64"
-          TOOLCHAIN="x86_64"
+        - TOOLCHAIN="x86_64"
           TARGET_BRANCH="master"
-    - name: "x86_64"
+    - name: "drm bridge partial"
       env:
-        - BUILDMAN="drm bridge partial"
-          TOOLCHAIN="arm64"
+        - TOOLCHAIN="arm64"
           TARGET_BRANCH="travis_work"
           TARGET_MODULE="drivers/gpu/drm/bridge/"
