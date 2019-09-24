@@ -1,6 +1,8 @@
 Binding for TI/National Semiconductor LP55xx LED Drivers
 
 Required properties:
+- #address-cells: 1
+- #size-cells: 0
 - compatible: one of
 	national,lp5521
 	national,lp5523
@@ -14,6 +16,18 @@ Required properties:
 Each child has own specific current settings
 - led-cur: Current setting at each LED channel (mA x10, 0 if LED is not connected)
 - max-cur: Maximun current at each LED channel.
+- reg: Output channel for the LED.  This is zero based channel identifier and
+	the data sheet is a one based channel identifier.
+	reg value to output to LED output number
+	D1 = reg value is 0
+	D2 = reg value is 1
+	D3 = reg value is 2
+	D4 = reg value is 3
+	D5 = reg value is 4
+	D6 = reg value is 5
+	D7 = reg value is 6
+	D8 = reg value is 7
+	D9 = reg value is 8
 
 Optional properties:
 - enable-gpio: GPIO attached to the chip's enable pin
@@ -35,23 +49,28 @@ example 1) LP5521
 on channel 0.
 
 lp5521@32 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	compatible = "national,lp5521";
 	reg = <0x32>;
 	label = "lp5521_pri";
 	clock-mode = /bits/ 8 <2>;
 
-	chan0 {
+	chan@0 {
+		reg = <0>;
 		led-cur = /bits/ 8 <0x2f>;
 		max-cur = /bits/ 8 <0x5f>;
 		linux,default-trigger = "heartbeat";
 	};
 
-	chan1 {
+	chan@1 {
+		reg = <1>;
 		led-cur = /bits/ 8 <0x2f>;
 		max-cur = /bits/ 8 <0x5f>;
 	};
 
-	chan2 {
+	chan@2 {
+		reg = <2>;
 		led-cur = /bits/ 8 <0x2f>;
 		max-cur = /bits/ 8 <0x5f>;
 	};
@@ -70,59 +89,70 @@ ASEL1    ASEL0    Address
  VEN      VEN       35h
 
 lp5523@32 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	compatible = "national,lp5523";
 	reg = <0x32>;
 	clock-mode = /bits/ 8 <1>;
 
-	chan0 {
+	chan@0 {
+		reg = <0>;
 		chan-name = "d1";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan1 {
+	chan@1 {
+		reg = <1>;
 		chan-name = "d2";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan2 {
+	chan@2 {
+		reg = <2>;
 		chan-name = "d3";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan3 {
+	chan@3 {
+		reg = <3>;
 		chan-name = "d4";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan4 {
+	chan@4 {
+		reg = <4>;
 		chan-name = "d5";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan5 {
+	chan@5 {
+		reg = <5>;
 		chan-name = "d6";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan6 {
+	chan@6 {
+		reg = <6>;
 		chan-name = "d7";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan7 {
+	chan@7 {
+		reg = <7>;
 		chan-name = "d8";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan8 {
+	chan@8 {
+		reg = <8>;
 		chan-name = "d9";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
@@ -133,29 +163,35 @@ example 3) LP5562
 4 channels are defined.
 
 lp5562@30 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	compatible = "ti,lp5562";
 	reg = <0x30>;
 	clock-mode = /bits/8 <2>;
 
-	chan0 {
+	chan@0 {
+		reg = <0>;
 		chan-name = "R";
 		led-cur = /bits/ 8 <0x20>;
 		max-cur = /bits/ 8 <0x60>;
 	};
 
-	chan1 {
+	chan@1 {
+		reg = <1>;
 		chan-name = "G";
 		led-cur = /bits/ 8 <0x20>;
 		max-cur = /bits/ 8 <0x60>;
 	};
 
-	chan2 {
+	chan@2 {
+		reg = <2>;
 		chan-name = "B";
 		led-cur = /bits/ 8 <0x20>;
 		max-cur = /bits/ 8 <0x60>;
 	};
 
-	chan3 {
+	chan@3 {
+		reg = <3>;
 		chan-name = "W";
 		led-cur = /bits/ 8 <0x20>;
 		max-cur = /bits/ 8 <0x60>;
@@ -167,62 +203,125 @@ example 4) LP8501
 Others are same as LP5523.
 
 lp8501@32 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	compatible = "ti,lp8501";
 	reg = <0x32>;
 	clock-mode = /bits/ 8 <2>;
 	pwr-sel = /bits/ 8 <3>;	/* D1~9 connected to VOUT */
 
-	chan0 {
+	chan@0 {
+		reg = <0>;
 		chan-name = "d1";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan1 {
+	chan@1 {
+		reg = <1>;
 		chan-name = "d2";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan2 {
+	chan@2 {
+		reg = <2>;
 		chan-name = "d3";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan3 {
+	chan@3 {
+		reg = <3>;
 		chan-name = "d4";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan4 {
+	chan@4 {
+		reg = <4>;
 		chan-name = "d5";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan5 {
+	chan@5 {
+		reg = <5>;
 		chan-name = "d6";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan6 {
+	chan@6 {
+		reg = <6>;
 		chan-name = "d7";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan7 {
+	chan@7 {
+		reg = <7>;
 		chan-name = "d8";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
 	};
 
-	chan8 {
+	chan@8 {
+		reg = <8>;
 		chan-name = "d9";
 		led-cur = /bits/ 8 <0x14>;
 		max-cur = /bits/ 8 <0x20>;
+	};
+};
+
+Multicolor Framework Support
+In addition to the nodes and properties defined above for device support the
+properties below are needed for multicolor framework support as defined in
+Documentation/devicetree/bindings/leds/leds-class-multicolor.txt
+
+Required child properties for multicolor framework
+	- color : Must be LED_COLOR_ID_MULTI
+	- function : see Documentation/devicetree/bindings/leds/common.txt
+
+Required grandchildren properties
+	- reg : This is the LED output of the device
+	- color : see Documentation/devicetree/bindings/leds/common.txt
+
+Multicolor LED example:
+lp5523: lp5523@32 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	compatible = "national,lp5523";
+	reg = <0x32>;
+	clock-mode = /bits/ 8 <0>; /* LP55XX_CLOCK_AUTO */
+
+	multi-led@2 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <2>;
+		color = <LED_COLOR_ID_MULTI>;
+		function = LED_FUNCTION_STANDBY;
+		linux,default-trigger = "heartbeat";
+
+		led@0 {
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+			reg = <0x0>;
+			color = <LED_COLOR_ID_GREEN>;
+		};
+
+		led@1 {
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+			reg = <0x1>;
+			color = <LED_COLOR_ID_BLUE>;
+		};
+
+		led@6 {
+			led-cur = /bits/ 8 <50>;
+			max-cur = /bits/ 8 <100>;
+			reg = <0x6>;
+			color = <LED_COLOR_ID_RED>;
+		};
 	};
 };
